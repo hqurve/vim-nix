@@ -26,7 +26,7 @@ jobs:
         uses: gorillio/github-action-sync@0.2.0
         with:
           # Upstream repo
-          upstream: LnLz/vim-nix
+          upstream: https://github.com/LnL7/vim-nix
           # Upstream branch to pull from
           upstream_branch: master
           # Branch to merge to

@@ -22,12 +22,12 @@ stdenv.mkDerivation rec {
 
   buildInputs = [ vim ];
 
-  installPhase = ''
+  installPhase = /* sh */ ''
     mkdir -p $out
     cp -r ftdetect ftplugin indent syntax $out
   '';
 
-  vimrc = writeText "vimrc" ''
+  vimrc = writeText "vimrc" /* vim */ ''
     filetype off
     set rtp^=${vader}
     set rtp^=${src}
@@ -42,15 +42,31 @@ stdenv.mkDerivation rec {
 
     set backspace=2
     set hlsearch
+
+    function! Nix_GetScriptID(fname) abort
+      let l:snlist = '''
+      redir => l:snlist
+      silent! scriptnames
+      redir END
+      let l:mx = '^\s*\(\d\+\):\s*\(.*\)$'
+      for l:line in split(l:snlist, "\n")
+        if stridx(substitute(l:line, '\\', '/', 'g'), a:fname) >= 0
+          return substitute(l:line, l:mx, '\1', ''')
+        endif
+      endfor
+    endfunction
+    function! Nix_GetFunc(fname, funcname) abort
+      return function('<SNR>' . Nix_GetScriptID(a:fname) . '_' . a:funcname)
+    endfunction
   '';
 
-  checkPhase = ''
+  checkPhase = /* sh */ ''
     ( vim -XNu ${vimrc} -i NONE -c 'Vader! test/*.vader' ) |& tee vim-nix-test.log >&2
   '';
 
   doCheck = true;
 
-  shellHook = ''
+  shellHook = /* sh */ ''
     vim() {
         command vim -XNu ${vimrc} -i NONE "$@"
     }

@@ -1,0 +1,6 @@
+language: nix
+
+before_script: |
+  git clone https://github.com/junegunn/vader.vim.git
+script: |
+  nix-shell --command ./test/run-tests.sh
